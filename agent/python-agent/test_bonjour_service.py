@@ -37,7 +37,7 @@ class TestBonjourService(unittest.TestCase):
             
             # Verify service info
             self.assertEqual(bonjour.info.port, 8081)
-            self.assertIn("_macmonitor._tcp.local.", bonjour.info.type)
+            self.assertEqual(bonjour.info.type, "_macmonitor._tcp.local.")
             
             # Check properties
             self.assertIn(b"version", bonjour.info.properties)
