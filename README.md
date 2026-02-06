@@ -145,16 +145,43 @@ Agent 启动后会自动在局域网广播服务。
 }
 ```
 
+## 测试
+
+Python Agent 包含完整的测试套件，确保所有功能按预期工作。
+
+### 运行测试
+
+```bash
+cd agent/python-agent
+python3 run_tests.py
+```
+
+### 测试覆盖
+
+- **29 个单元测试** 覆盖所有核心功能：
+  - 系统监控（CPU、内存、磁盘、网络）
+  - REST API 端点
+  - Bonjour/mDNS 服务
+  - 数据一致性验证
+  - API 响应格式验证
+
+详细测试说明请参考 [Python Agent README](agent/python-agent/README.md)。
+
 ## 开发路线图
 
-### Phase 1: MVP ✅ (当前)
+### Phase 1: MVP ✅ (已完成)
 - [x] 基础 UI 框架
 - [x] Python Agent 实现
 - [x] Bonjour 设备发现
 - [x] 核心监控功能
+- [x] 完整的单元测试套件（29个测试）
+- [x] API 文档验证
+- [x] 代码质量检查
+- [x] 安全扫描
 
 ### Phase 2: 完善功能 🚧
 - [ ] Swift Agent 完整实现
+- [ ] iOS Dashboard App
 - [ ] 历史数据图表
 - [ ] 进程列表查看
 - [ ] 本地通知推送
