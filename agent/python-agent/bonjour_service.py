@@ -8,18 +8,18 @@ class BonjourPublisher:
         self.info = None
     
     def start(self):
-        """启动 Bonjour 服务发布"""
+        """启动 Bonjour 服务发布 / Start Bonjour service publishing"""
         try:
             self.zeroconf = Zeroconf()
             
             hostname = socket.gethostname()
             
-            # 获取本机 IP 地址
+            # 获取本机 IP 地址 / Get local IP address
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             try:
                 s.connect(("8.8.8.8", 80))
                 ip_address = s.getsockname()[0]
-            except:
+            except Exception:
                 ip_address = "127.0.0.1"
             finally:
                 s.close()
@@ -43,7 +43,7 @@ class BonjourPublisher:
             print(f"❌ Failed to publish Bonjour service: {e}")
     
     def stop(self):
-        """停止 Bonjour 服务"""
+        """停止 Bonjour 服务 / Stop Bonjour service"""
         if self.zeroconf and self.info:
             self.zeroconf.unregister_service(self.info)
             self.zeroconf.close()
