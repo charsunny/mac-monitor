@@ -22,22 +22,41 @@
 
 ## 快速开始
 
-### 1. 打开项目
+### 1. 生成和打开项目
+
+**方式 A: 使用自动化脚本（推荐）**
 
 ```bash
 cd client/iOS/MacMonitor
+
+# 生成 Xcode 项目
+./generate_xcode_project.sh
+
+# 打开项目
 open MacMonitor.xcodeproj
 ```
 
-如果没有 `.xcodeproj` 文件，你可以用 Xcode 直接打开这个目录，Xcode 会自动识别 Swift 文件并创建项目。
+**方式 B: 使用 Make**
 
-或者在 Xcode 中：
-1. File > New > Project
-2. 选择 iOS > App
-3. Product Name: MacMonitor
-4. Interface: SwiftUI
-5. Language: Swift
-6. 将现有的 Swift 文件添加到项目中
+```bash
+cd client/iOS/MacMonitor
+
+# 查看所有可用命令
+make help
+
+# 完整设置（安装工具 + 生成项目）
+make setup
+
+# 或者只生成项目
+make generate
+
+# 打开项目
+make open
+```
+
+**方式 C: 手动创建**
+
+如果自动化工具不可用，请参考 [XCODE_PROJECT_SETUP.md](XCODE_PROJECT_SETUP.md) 手动在 Xcode 中创建项目。
 
 ### 2. 配置项目
 
@@ -58,12 +77,51 @@ open MacMonitor.xcodeproj
 4. **部署目标**
    - 设置为 iOS 16.0 或更高
 
-### 3. 运行应用
+### 3. 构建和运行应用
+
+**使用脚本:**
+
+```bash
+# 构建应用
+./build_app.sh
+
+# 运行应用（构建 + 启动模拟器）
+./run_app.sh
+```
+
+**使用 Make:**
+
+```bash
+# 构建
+make build
+
+# 运行
+make run
+
+# 运行测试
+make test
+```
+
+**使用 Xcode:**
 
 1. 确保 Mac Agent 正在运行（参见根目录 README）
 2. 在 Xcode 中选择目标设备（iPhone 或模拟器）
 3. 点击运行按钮（⌘R）
 4. 首次运行时，授予本地网络访问权限
+
+**命令行构建:**
+
+```bash
+# Debug 版本
+xcodebuild build \
+  -project MacMonitor.xcodeproj \
+  -scheme MacMonitor \
+  -configuration Debug \
+  -destination 'platform=iOS Simulator,name=iPhone 15 Pro'
+
+# Release 版本
+make build-release
+```
 
 ## 项目结构
 
@@ -126,6 +184,20 @@ MacMonitor/
 - 查看系统信息
 
 ## 开发说明
+
+### 项目文件管理
+
+本项目使用 XcodeGen 管理项目配置，这样可以：
+- 避免 `.xcodeproj` 文件冲突
+- 保持项目配置的一致性
+- 通过 `project.yml` 版本控制项目设置
+
+项目配置文件：
+- `project.yml` - XcodeGen 项目配置
+- `generate_xcode_project.sh` - 项目生成脚本
+- `build_app.sh` - 构建脚本
+- `run_app.sh` - 运行脚本
+- `Makefile` - Make 命令集合
 
 ### 添加新功能
 
