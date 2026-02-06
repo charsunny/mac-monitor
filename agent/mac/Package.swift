@@ -18,5 +18,9 @@ let package = Package(
                 .product(name: "Hummingbird", package: "hummingbird"),
             ]
         ),
+        .testTarget(
+            name: "MacMonitorAgentTests",
+            dependencies: ["MacMonitorAgent"]
+        ),
     ]
 )
