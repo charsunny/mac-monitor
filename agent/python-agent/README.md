@@ -35,6 +35,54 @@ Agent 将在 `http://0.0.0.0:8080` 启动并自动通过 Bonjour 广播服务。
 curl http://localhost:8080/api/status
 ```
 
+## 测试
+
+项目包含完整的单元测试，覆盖所有核心功能。
+
+### 运行所有测试
+
+```bash
+python3 run_tests.py
+```
+
+或者使用 unittest：
+
+```bash
+python3 -m unittest discover -s . -p "test_*.py" -v
+```
+
+### 运行单个测试文件
+
+```bash
+# 测试系统监控
+python3 -m unittest test_system_monitor.py -v
+
+# 测试 API 服务器
+python3 -m unittest test_api_server.py -v
+
+# 测试 Bonjour 服务
+python3 -m unittest test_bonjour_service.py -v
+```
+
+### 测试覆盖
+
+- **test_system_monitor.py** - 系统监控核心功能测试
+  - CPU、内存、磁盘、网络信息获取
+  - 进程和线程统计
+  - 电池信息（如适用）
+  - 完整状态数据结构验证
+
+- **test_api_server.py** - API 服务器测试
+  - 所有 REST API 端点（/health, /api/info, /api/status）
+  - 响应格式验证
+  - 数据结构与文档一致性检查
+  - CORS 支持
+
+- **test_bonjour_service.py** - Bonjour/mDNS 服务测试
+  - 服务发布和注销
+  - 多实例支持
+  - 服务属性验证
+
 ## 作为后台服务运行
 
 ### macOS (使用 launchd)
