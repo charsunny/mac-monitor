@@ -26,7 +26,7 @@ xcode-select --install
 
 ```bash
 git clone https://github.com/charsunny/mac-monitor.git
-cd mac-monitor/agent/swift-agent
+cd mac-monitor/agent/mac
 ```
 
 ### 2. 运行 Agent
@@ -188,7 +188,7 @@ launchctl load ~/Library/LaunchAgents/com.macmonitor.agent.plist
 ```bash
 cd mac-monitor
 git pull
-cd agent/swift-agent
+cd agent/mac
 swift build --clean
 ./run.sh run
 ```

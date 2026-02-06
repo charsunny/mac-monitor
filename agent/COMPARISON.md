@@ -113,7 +113,7 @@
 ### Swift Agent
 
 ```bash
-cd agent/swift-agent
+cd agent/mac
 
 # 开发模式
 ./run.sh run
@@ -128,7 +128,7 @@ swift run
 ### Python Agent
 
 ```bash
-cd agent/python-agent
+cd agent/python
 
 # 安装依赖
 pip install -r requirements.txt

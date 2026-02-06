@@ -25,7 +25,7 @@
 ### 1. 打开项目
 
 ```bash
-cd iOS/MacMonitor
+cd client/iOS/MacMonitor
 open MacMonitor.xcodeproj
 ```
 
