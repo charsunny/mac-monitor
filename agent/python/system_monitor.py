@@ -75,7 +75,7 @@ class SystemMonitor:
                     for name, entries in temps.items():
                         if entries:
                             return entries[0].current
-        except:
+        except Exception:
             pass
         return None
     
@@ -87,7 +87,7 @@ class SystemMonitor:
                     "level": battery.percent / 100.0,
                     "isCharging": battery.power_plugged
                 }
-        except:
+        except Exception:
             pass
         return {"level": None, "isCharging": None}
     

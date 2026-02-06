@@ -16,9 +16,11 @@ let package = Package(
     targets: [
         .target(
             name: "MacMonitor",
-            dependencies: []),
+            dependencies: [],
+            path: "MacMonitor"),
         .testTarget(
             name: "MacMonitorTests",
-            dependencies: ["MacMonitor"]),
+            dependencies: ["MacMonitor"],
+            path: "Tests/MacMonitorTests"),
     ]
 )
