@@ -177,8 +177,8 @@ class SystemMonitor {
             )
         }
         
-        let bytesInRate = Int((currentStats.bytesReceived - lastStats.bytesReceived) / UInt64(timeDelta))
-        let bytesOutRate = Int((currentStats.bytesSent - lastStats.bytesSent) / UInt64(timeDelta))
+        let bytesInRate = Int(Double(currentStats.bytesReceived - lastStats.bytesReceived) / timeDelta)
+        let bytesOutRate = Int(Double(currentStats.bytesSent - lastStats.bytesSent) / timeDelta)
         
         return NetworkInfo(
             bytesIn: bytesInRate,

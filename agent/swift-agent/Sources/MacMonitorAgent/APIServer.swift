@@ -35,7 +35,7 @@ struct APIServer {
             return self.monitor.getStatus()
         }
         
-        var app = Application(
+        let app = Application(
             router: router,
             configuration: .init(
                 address: .hostname("0.0.0.0", port: self.port),
