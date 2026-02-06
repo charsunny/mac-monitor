@@ -275,6 +275,6 @@ MIT License - 详见项目根目录的 LICENSE 文件
 
 ## 相关链接
 
-- [Python Agent 实现](../python-agent/)
-- [iPhone Dashboard 应用](../../iOS/)
+- [Python Agent 实现](../python/)
+- [iPhone Dashboard 应用](../../client/iOS/)
 - [项目主页](../../README.md)
