@@ -4,10 +4,12 @@
 Complete test suite for the Mac Monitor Python Agent, ensuring all functionality works as documented.
 
 ## Test Statistics
-- **Total Tests**: 29
+- **Total Tests**: 34
 - **Pass Rate**: 100%
 - **Code Coverage**: All core modules tested
 - **Security Scan**: 0 vulnerabilities found
+- **Last Run**: 2026-02-06
+- **Dependencies**: All required packages installed via requirements.txt
 
 ## Test Breakdown
 
@@ -49,7 +51,17 @@ Tests mDNS/Bonjour service discovery:
 - ✅ Multiple instance support
 - ✅ Stop without start handling
 
-### 4. Integration Tests (6 tests)
+### 4. Dashboard Tests (5 tests)
+**File**: `test_dashboard.py`
+
+Tests web dashboard functionality:
+- ✅ Dashboard root accessibility
+- ✅ CSS file accessibility
+- ✅ JavaScript file accessibility
+- ✅ HTML structure and required elements
+- ✅ API integration
+
+### 5. Integration Tests (6 tests)
 **File**: `test_integration.py`
 
 Tests complete system integration:
@@ -59,6 +71,13 @@ Tests complete system integration:
 - ✅ Bonjour service lifecycle
 - ✅ Data consistency across calls
 - ✅ Documentation format compliance
+
+## Prerequisites
+
+Before running tests, install the required dependencies:
+```bash
+pip3 install -r requirements.txt
+```
 
 ## Running Tests
 
@@ -77,6 +96,9 @@ python3 -m unittest test_api_server.py -v
 
 # Bonjour service tests
 python3 -m unittest test_bonjour_service.py -v
+
+# Dashboard tests
+python3 -m unittest test_dashboard.py -v
 
 # Integration tests
 python3 -m unittest test_integration.py -v
@@ -150,4 +172,11 @@ The Mac Monitor Python Agent has a comprehensive test suite that ensures:
 4. No security vulnerabilities exist
 5. Code quality standards are met
 
-All 29 tests pass successfully, confirming the implementation meets all requirements specified in the documentation.
+All 34 tests pass successfully, confirming the implementation meets all requirements specified in the documentation.
+
+## Recent Changes (2026-02-06)
+
+### Code Quality Improvements
+- Fixed bare except clauses in system_monitor.py (lines 78 and 90)
+- Replaced `except:` with `except Exception:` for better error handling
+- All tests continue to pass after improvements
