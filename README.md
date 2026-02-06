@@ -30,6 +30,7 @@ Mac Monitor 是一个完整的系统监控解决方案，包含：
 - ✅ Bonjour 服务自动发布
 - ✅ 跨平台（提供 Swift 和 Python 两种实现）
 - ✅ 轻量级，低资源占用
+- ✅ Swift 版本包含菜单栏客户端（macOS 专属）
 
 ## 项目结构
 
@@ -172,6 +173,7 @@ python3 run_tests.py
 ### Phase 1: MVP ✅ (已完成)
 - [x] 基础 UI 框架
 - [x] Python Agent 实现
+- [x] Swift Agent 实现（HTTP API + 菜单栏客户端）
 - [x] Bonjour 设备发现
 - [x] 核心监控功能
 - [x] 完整的单元测试套件（29个测试）
@@ -180,7 +182,6 @@ python3 run_tests.py
 - [x] 安全扫描
 
 ### Phase 2: 完善功能 🚧
-- [ ] Swift Agent 完整实现
 - [ ] iOS Dashboard App
 - [ ] 历史数据图表
 - [ ] 进程列表查看
