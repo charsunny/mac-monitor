@@ -42,6 +42,8 @@ def create_app():
             if os.path.exists(index_path):
                 return FileResponse(index_path)
             return {"message": "Dashboard not found"}
+    else:
+        print(f"⚠️  Warning: Dashboard directory not found at {dashboard_dir}")
     
     @app.get("/api/status")
     async def get_status():

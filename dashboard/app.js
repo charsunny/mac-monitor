@@ -229,7 +229,7 @@ class MacMonitorDashboard {
 
         // CPU
         if (data.cpu) {
-            const cpuUsage = (data.cpu.usage * 100).toFixed(1);
+            const cpuUsage = Math.max(0, Math.min(100, (data.cpu.usage * 100))).toFixed(1);
             document.getElementById('cpuUsage').textContent = `${cpuUsage}%`;
             document.getElementById('cpuCores').textContent = data.cpu.coreCount || '--';
             document.getElementById('cpuFreq').textContent = data.cpu.frequency ? 
@@ -244,7 +244,7 @@ class MacMonitorDashboard {
 
         // Memory
         if (data.memory) {
-            const memUsage = (data.memory.pressure * 100).toFixed(1);
+            const memUsage = Math.max(0, Math.min(100, (data.memory.pressure * 100))).toFixed(1);
             document.getElementById('memUsage').textContent = `${memUsage}%`;
             document.getElementById('memUsed').textContent = this.formatBytes(data.memory.used);
             document.getElementById('memTotal').textContent = this.formatBytes(data.memory.total);
@@ -258,7 +258,9 @@ class MacMonitorDashboard {
 
         // Disk
         if (data.disk) {
-            const diskUsage = ((data.disk.used / data.disk.total) * 100).toFixed(1);
+            const diskUsage = data.disk.total > 0 ? 
+                Math.max(0, Math.min(100, ((data.disk.used / data.disk.total) * 100))).toFixed(1) : 
+                '0.0';
             document.getElementById('diskUsage').textContent = `${diskUsage}%`;
             document.getElementById('diskUsed').textContent = this.formatBytes(data.disk.used);
             document.getElementById('diskFree').textContent = this.formatBytes(data.disk.free);
@@ -285,12 +287,12 @@ class MacMonitorDashboard {
             `${temp.toFixed(1)}°C` : 'N/A';
         
         const batteryLevel = data.batteryLevel;
-        document.getElementById('batteryLevel').textContent = batteryLevel !== null ? 
+        document.getElementById('batteryLevel').textContent = batteryLevel != null ? 
             `${(batteryLevel * 100).toFixed(0)}%` : 'N/A';
         
         const isCharging = data.isCharging;
         document.getElementById('chargingStatus').textContent = 
-            isCharging === null ? 'N/A' : (isCharging ? '充电中' : '未充电');
+            isCharging == null ? 'N/A' : (isCharging ? '充电中' : '未充电');
         
         document.getElementById('tempUpdate').textContent = now;
 

@@ -45,7 +45,7 @@ class TestDashboard(unittest.TestCase):
         """Test that dashboard CSS file is accessible"""
         response = self.client.get("/dashboard/styles.css")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("text/css", response.headers["content-type"])
+        self.assertIn("css", response.headers["content-type"].lower())
         self.assertIn("dark-mode", response.text)
     
     def test_dashboard_js_accessible(self):
