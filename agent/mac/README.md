@@ -52,7 +52,7 @@
 ### 方式 1: 使用 Swift Package Manager（开发）
 
 ```bash
-cd agent/swift-agent
+cd agent/mac
 swift build
 swift run
 ```
@@ -60,7 +60,7 @@ swift run
 ### 方式 2: 编译发布版本
 
 ```bash
-cd agent/swift-agent
+cd agent/mac
 swift build -c release
 .build/release/MacMonitorAgent
 ```
@@ -70,7 +70,7 @@ swift build -c release
 ### 方式 3: 使用 Xcode
 
 ```bash
-cd agent/swift-agent
+cd agent/mac
 open Package.swift
 ```
 
@@ -223,7 +223,7 @@ MacMonitorAgent
 ### 项目结构
 
 ```
-swift-agent/
+mac/
 ├── Package.swift              # Swift 包配置
 ├── Sources/
 │   └── MacMonitorAgent/
@@ -275,6 +275,6 @@ MIT License - 详见项目根目录的 LICENSE 文件
 
 ## 相关链接
 
-- [Python Agent 实现](../python-agent/)
-- [iPhone Dashboard 应用](../../iOS/)
+- [Python Agent 实现](../python/)
+- [iPhone Dashboard 应用](../../client/iOS/)
 - [项目主页](../../README.md)

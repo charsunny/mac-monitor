@@ -25,9 +25,12 @@ def create_app():
     
     # 获取 dashboard 目录路径
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    dashboard_dir = os.path.join(os.path.dirname(current_dir), 'dashboard')
+    # 新的目录结构：从 agent/python 到 client/web
+    dashboard_dir = os.path.join(os.path.dirname(os.path.dirname(current_dir)), 'client', 'web')
     
-    # 如果 dashboard 目录不存在（比如在 agent/python-agent 目录下运行），尝试上一级目录
+    # 兼容旧的目录结构
+    if not os.path.exists(dashboard_dir):
+        dashboard_dir = os.path.join(os.path.dirname(current_dir), 'dashboard')
     if not os.path.exists(dashboard_dir):
         dashboard_dir = os.path.join(os.path.dirname(os.path.dirname(current_dir)), 'dashboard')
     

@@ -13,7 +13,7 @@
    ```
    或者直接使用命令行：
    ```bash
-   cd iOS/MacMonitor
+   cd client/iOS/MacMonitor
    open MacMonitor.xcodeproj
    ```
    

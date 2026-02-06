@@ -126,7 +126,7 @@ let bytesInRate = Int(Double(bytesReceived - lastBytesReceived) / timeDelta)
 ## 项目结构
 
 ```
-swift-agent/
+mac/
 ├── Package.swift                    # Swift 包配置
 ├── README.md                        # Swift Agent 文档
 ├── run.sh                          # 构建运行脚本
@@ -165,7 +165,7 @@ Hummingbird 框架本身会自动拉取其依赖（NIO、Logging 等）。
 ### 开发模式
 
 ```bash
-cd agent/swift-agent
+cd agent/mac
 swift run
 # 或
 ./run.sh run

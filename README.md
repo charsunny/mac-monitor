@@ -48,21 +48,27 @@ Mac Monitor 是一个完整的系统监控解决方案，包含：
 
 ```
 mac-monitor/
-├── iOS/               # 原生 iOS 应用（推荐）
-│   └── MacMonitor/    # SwiftUI 项目
-│       ├── MacMonitorApp.swift
-│       ├── ContentView.swift
-│       ├── MonitoringCards.swift
-│       ├── Models.swift
-│       ├── ViewModels/
-│       └── README.md
-├── dashboard/         # Web Dashboard（浏览器版）
-│   ├── index.html
-│   ├── styles.css
-│   └── app.js
-├── agent/            # Mac 监控 Agent
-│   └── python-agent/ # Python 实现
-└── docs/             # 文档
+├── agent/              # 监控 Agent 服务端
+│   ├── python/         # Python 实现
+│   │   ├── main.py
+│   │   ├── api_server.py
+│   │   ├── system_monitor.py
+│   │   └── requirements.txt
+│   └── mac/            # Swift 实现（macOS 专属）
+│       ├── Package.swift
+│       └── Sources/
+├── client/             # 客户端应用
+│   ├── web/            # Web Dashboard（浏览器版）
+│   │   ├── index.html
+│   │   ├── styles.css
+│   │   └── app.js
+│   └── iOS/            # 原生 iOS 应用（推荐）
+│       └── MacMonitor/ # SwiftUI 项目
+│           ├── MacMonitorApp.swift
+│           ├── ContentView.swift
+│           ├── MonitoringCards.swift
+│           └── Models.swift
+└── docs/               # 文档
 ```
 
 ## 快速开始
@@ -72,7 +78,7 @@ mac-monitor/
 #### 方式 A: Python 版本（推荐快速测试）
 
 ```bash
-cd agent/python-agent
+cd agent/python
 pip install -r requirements.txt
 python3 main.py
 ```
@@ -80,7 +86,7 @@ python3 main.py
 #### 方式 B: Swift 版本
 
 ```bash
-cd agent/swift-agent
+cd agent/mac
 swift build
 swift run
 ```
@@ -95,10 +101,10 @@ Agent 启动后会自动在局域网广播服务，并在 `http://localhost:8080
 
 1. 使用 Xcode 打开项目：
    ```bash
-   cd iOS/MacMonitor
+   cd client/iOS/MacMonitor
    open MacMonitor.xcodeproj
    ```
-   或在 Xcode 中：File > Open，选择 `iOS/MacMonitor` 目录
+   或在 Xcode 中：File > Open，选择 `client/iOS/MacMonitor` 目录
 
 2. 配置签名：
    - 选择 Target > Signing & Capabilities
@@ -109,7 +115,7 @@ Agent 启动后会自动在局域网广播服务，并在 `http://localhost:8080
    - 点击运行（⌘R）
    - 首次运行时授予本地网络权限
 
-详细说明请参考 [iOS App README](iOS/MacMonitor/README.md)
+详细说明请参考 [iOS App README](client/iOS/MacMonitor/README.md)
 
 #### 方式 B: Web Dashboard
 
@@ -207,7 +213,7 @@ Python Agent 包含完整的测试套件，确保所有功能按预期工作。
 ### 运行测试
 
 ```bash
-cd agent/python-agent
+cd agent/python
 python3 run_tests.py
 ```
 
@@ -221,7 +227,7 @@ python3 run_tests.py
   - 数据一致性验证
   - API 响应格式验证
 
-详细测试说明请参考 [Python Agent README](agent/python-agent/README.md)。
+详细测试说明请参考 [Python Agent README](agent/python/README.md)。
 
 ## 开发路线图
 
