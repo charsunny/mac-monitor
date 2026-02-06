@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Mac Monitor Dashboard</title>
+    <link rel="stylesheet" href="/dashboard/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>🖥️ Mac Monitor</h1>
+                <div class="device-info">
+                    <span id="deviceName">未连接</span>
+                    <span class="connection-status" id="connectionStatus">●</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <select id="deviceSelector" class="device-selector">
+                    <option value="">正在扫描设备...</option>
+                </select>
+                <button id="refreshBtn" class="icon-btn" title="刷新">🔄</button>
+                <button id="darkModeToggle" class="icon-btn" title="切换暗色模式">🌙</button>
+            </div>
+        </header>
+
+        <!-- Alert Banner -->
+        <div id="alertBanner" class="alert-banner hidden">
+            <span id="alertMessage"></span>
+            <button id="dismissAlert" class="dismiss-btn">✕</button>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <main class="dashboard">
+            <!-- CPU Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>💻 CPU</h3>
+                    <span class="last-update" id="cpuUpdate"></span>
+                </div>
+                <div class="card-body">
+                    <div class="metric-main">
+                        <div class="metric-value" id="cpuUsage">--</div>
+                        <div class="metric-label">使用率</div>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-item">
+                            <span class="metric-name">核心数</span>
+                            <span class="metric-val" id="cpuCores">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">频率</span>
+                            <span class="metric-val" id="cpuFreq">--</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="cpuProgress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Memory Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🧠 内存</h3>
+                    <span class="last-update" id="memUpdate"></span>
+                </div>
+                <div class="card-body">
+                    <div class="metric-main">
+                        <div class="metric-value" id="memUsage">--</div>
+                        <div class="metric-label">使用率</div>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-item">
+                            <span class="metric-name">已使用</span>
+                            <span class="metric-val" id="memUsed">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">总容量</span>
+                            <span class="metric-val" id="memTotal">--</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="memProgress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disk Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>💾 磁盘</h3>
+                    <span class="last-update" id="diskUpdate"></span>
+                </div>
+                <div class="card-body">
+                    <div class="metric-main">
+                        <div class="metric-value" id="diskUsage">--</div>
+                        <div class="metric-label">使用率</div>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-item">
+                            <span class="metric-name">已使用</span>
+                            <span class="metric-val" id="diskUsed">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">可用</span>
+                            <span class="metric-val" id="diskFree">--</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="diskProgress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🌐 网络</h3>
+                    <span class="last-update" id="netUpdate"></span>
+                </div>
+                <div class="card-body">
+                    <div class="metric-main network-metrics">
+                        <div class="network-metric">
+                            <div class="metric-value small" id="netDownload">--</div>
+                            <div class="metric-label">↓ 下载</div>
+                        </div>
+                        <div class="network-metric">
+                            <div class="metric-value small" id="netUpload">--</div>
+                            <div class="metric-label">↑ 上传</div>
+                        </div>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-item">
+                            <span class="metric-name">接收包数</span>
+                            <span class="metric-val" id="netPacketsIn">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">发送包数</span>
+                            <span class="metric-val" id="netPacketsOut">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Temperature Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🌡️ 温度</h3>
+                    <span class="last-update" id="tempUpdate"></span>
+                </div>
+                <div class="card-body">
+                    <div class="metric-main">
+                        <div class="metric-value" id="temperature">--</div>
+                        <div class="metric-label">CPU 温度</div>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-item">
+                            <span class="metric-name">电池电量</span>
+                            <span class="metric-val" id="batteryLevel">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">充电状态</span>
+                            <span class="metric-val" id="chargingStatus">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>⚙️ 进程</h3>
+                    <span class="last-update" id="procUpdate"></span>
+                </div>
+                <div class="card-body">
+                    <div class="metric-main">
+                        <div class="metric-value" id="processCount">--</div>
+                        <div class="metric-label">进程数</div>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-item">
+                            <span class="metric-name">线程数</span>
+                            <span class="metric-val" id="threadCount">--</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-name">运行时间</span>
+                            <span class="metric-val" id="uptime">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <span id="lastRefresh">最后更新: --</span>
+            <span class="auto-refresh">⟳ 自动刷新: 5秒</span>
+        </footer>
+    </div>
+
+    <!-- Settings Modal (optional for future) -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>设置</h2>
+            <div class="setting-group">
+                <label>CPU 告警阈值 (%)</label>
+                <input type="number" id="cpuThreshold" value="80" min="0" max="100">
+            </div>
+            <div class="setting-group">
+                <label>内存告警阈值 (%)</label>
+                <input type="number" id="memThreshold" value="80" min="0" max="100">
+            </div>
+            <button id="saveSettings">保存</button>
+            <button id="closeSettings">关闭</button>
+        </div>
+    </div>
+
+    <script src="/dashboard/app.js"></script>
+</body>
+</html>

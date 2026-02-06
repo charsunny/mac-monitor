@@ -8,20 +8,32 @@
 ## 项目简介
 
 Mac Monitor 是一个完整的系统监控解决方案，包含：
-- **iPhone Dashboard App** - 横屏全屏监控仪表盘
-- **Mac Agent** - 轻量级系统监控服务（Swift & Python 双实现）
+- **原生 iOS App** - SwiftUI 构建的原生应用（推荐）
+- **Web Dashboard** - 可在浏览器中使用的响应式网页版
+- **Mac Agent** - 轻量级系统监控服务（Python 实现）
 
 通过 Bonjour/mDNS 自动发现局域网内的 Mac 设备，实时显示系统资源使用情况。
 
 ## 功能特性
 
-### 📱 iPhone Dashboard
-- ✅ 横屏单页面设计，适合放置在桌面常亮显示
+### 📱 iPhone App（原生 iOS）
+- ✅ SwiftUI 原生应用，性能优异
+- ✅ 横屏/竖屏自适应布局
 - ✅ 6 个核心监控卡片（CPU、内存、磁盘、网络、温度、进程）
-- ✅ 自动设备发现（Bonjour）
+- ✅ 自动设备发现（Bonjour/Network Framework）
 - ✅ 设备快速切换
 - ✅ 告警系统（CPU/内存超阈值）
 - ✅ 实时自动刷新（5秒间隔）
+- ✅ 支持 Dark Mode
+- ✅ 本地推送通知
+
+### 🌐 Web Dashboard
+- ✅ 响应式设计，适配所有设备
+- ✅ 无需安装，浏览器直接访问
+- ✅ 横屏单页面设计，适合桌面常亮显示
+- ✅ 6 个核心监控卡片
+- ✅ 自动设备发现
+- ✅ 告警系统
 - ✅ 支持 Dark Mode
 
 ### 🖥️ Mac Agent
@@ -36,10 +48,19 @@ Mac Monitor 是一个完整的系统监控解决方案，包含：
 
 ```
 mac-monitor/
-├── iOS/              # iPhone Dashboard 应用
-│   └── MacMonitor/   # SwiftUI 项目
+├── iOS/               # 原生 iOS 应用（推荐）
+│   └── MacMonitor/    # SwiftUI 项目
+│       ├── MacMonitorApp.swift
+│       ├── ContentView.swift
+│       ├── MonitoringCards.swift
+│       ├── Models.swift
+│       ├── ViewModels/
+│       └── README.md
+├── dashboard/         # Web Dashboard（浏览器版）
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
 ├── agent/            # Mac 监控 Agent
-│   ├── swift-agent/  # Swift 实现（推荐）
 │   └── python-agent/ # Python 实现
 └── docs/             # 文档
 ```
@@ -64,23 +85,52 @@ swift build
 swift run
 ```
 
-Agent 启动后会自动在局域网广播服务。
+Agent 启动后会自动在局域网广播服务，并在 `http://localhost:8080` 提供 Web Dashboard 和 API 服务。
 
-### 2. 运行 iOS App
+### 2. 使用 Dashboard
 
-1. 使用 Xcode 打开 `iOS/MacMonitor/MacMonitor.xcodeproj`
-2. 选择目标设备（iPhone 或模拟器）
-3. 点击运行（⌘R）
+有两种方式访问 Mac Monitor：
 
-**注意**: 需要授予本地网络访问权限才能发现设备。
+#### 方式 A: 原生 iOS App（推荐）
+
+1. 使用 Xcode 打开项目：
+   ```bash
+   cd iOS/MacMonitor
+   open MacMonitor.xcodeproj
+   ```
+   或在 Xcode 中：File > Open，选择 `iOS/MacMonitor` 目录
+
+2. 配置签名：
+   - 选择 Target > Signing & Capabilities
+   - 选择你的 Team
+
+3. 运行应用：
+   - 选择目标设备（iPhone 或模拟器）
+   - 点击运行（⌘R）
+   - 首次运行时授予本地网络权限
+
+详细说明请参考 [iOS App README](iOS/MacMonitor/README.md)
+
+#### 方式 B: Web Dashboard
+
+Agent 启动后，通过浏览器访问：
+
+**iPhone / iPad**
+1. 确保设备与 Mac 在同一局域网
+2. 使用 Safari 访问 `http://<Mac的IP>:8080/`
+3. 将页面旋转至横屏模式以获得最佳体验
+4. 可添加到主屏幕作为 Web App
+
+**桌面浏览器**
+直接访问 `http://localhost:8080/` 即可使用
 
 ## 系统架构
 
 ```
 ┌─────────────────┐         ┌──────────────────┐         ┌─────────────────┐
 │                 │         │                  │         │                 │
-│  iPhone App     │◄───────►│  Mac Agent       │◄───────►│  Mac System     │
-│  (Dashboard)    │   WiFi  │  (监控服务)       │         │  (被监控电脑)    │
+│  iOS App /      │◄───────►│  Mac Agent       │◄───────►│  Mac System     │
+│  Web Dashboard  │   WiFi  │  (监控服务)       │         │  (被监控电脑)    │
 │                 │         │                  │         │                 │
 └─────────────────┘         └──────────────────┘         └─────────────────┘
      Bonjour 发现              HTTP REST API               系统调用
@@ -89,19 +139,23 @@ Agent 启动后会自动在局域网广播服务。
 
 ## 技术栈
 
-### iPhone App
+## 技术栈
+
+### iOS App（原生版）
 - SwiftUI & Combine
-- Network Framework (Bonjour)
+- Network Framework（Bonjour 设备发现）
+- UserNotifications（本地推送）
 - MVVM 架构
 - iOS 16.0+
 
-### Mac Agent
-**Swift 版本:**
-- Hummingbird Web Framework
-- Foundation & IOKit
-- macOS 13.0+
+### Dashboard (Web 版)
+- 纯原生 HTML5 / CSS3 / JavaScript
+- 响应式设计，适配移动端和桌面端
+- 支持 PWA（可添加到主屏幕）
+- Dark Mode 支持
 
-**Python 版本:**
+### Mac Agent
+**Python 版本（当前使用）:**
 - FastAPI
 - psutil
 - zeroconf
@@ -159,10 +213,11 @@ python3 run_tests.py
 
 ### 测试覆盖
 
-- **29 个单元测试** 覆盖所有核心功能：
+- **34 个单元测试** 覆盖所有核心功能：
   - 系统监控（CPU、内存、磁盘、网络）
   - REST API 端点
   - Bonjour/mDNS 服务
+  - Dashboard 集成测试
   - 数据一致性验证
   - API 响应格式验证
 
@@ -171,21 +226,27 @@ python3 run_tests.py
 ## 开发路线图
 
 ### Phase 1: MVP ✅ (已完成)
-- [x] 基础 UI 框架
 - [x] Python Agent 实现
 - [x] Swift Agent 实现（HTTP API + 菜单栏客户端）
 - [x] Bonjour 设备发现
 - [x] 核心监控功能
-- [x] 完整的单元测试套件（29个测试）
+- [x] Web Dashboard 实现（iPhone 横屏优化）
+- [x] **原生 iOS App 实现（SwiftUI）**
+- [x] 6 个核心监控卡片（CPU、内存、磁盘、网络、温度、进程）
+- [x] 自动刷新和设备切换
+- [x] 告警系统（CPU/内存超阈值）
+- [x] Dark Mode 支持
+- [x] 本地通知推送（iOS App）
+- [x] 完整的单元测试套件（34个测试）
 - [x] API 文档验证
 - [x] 代码质量检查
 - [x] 安全扫描
 
 ### Phase 2: 完善功能 🚧
-- [ ] iOS Dashboard App
 - [ ] 历史数据图表
 - [ ] 进程列表查看
-- [ ] 本地通知推送
+- [ ] Widget 支持（iOS 14+）
+- [ ] Apple Watch 伴侣应用
 
 ### Phase 3: 高级功能 📋
 - [ ] WebSocket 实时推送
@@ -195,7 +256,14 @@ python3 run_tests.py
 
 ## 截图
 
-（占位 - 待添加实际截图）
+### 浅色模式
+![Dashboard Light Mode](https://github.com/user-attachments/assets/ded64b14-7407-4e91-8736-365fac3fced0)
+
+### 深色模式
+![Dashboard Dark Mode](https://github.com/user-attachments/assets/54de8fe7-7334-4673-bf96-bfd381dcd095)
+
+### iPhone 横屏视图
+![iPhone Landscape](https://github.com/user-attachments/assets/16f317fe-e718-418d-8441-56d8f2a2cc88)
 
 ## 贡献指南
 
