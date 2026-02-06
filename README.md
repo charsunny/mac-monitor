@@ -1,148 +1,198 @@
-# Mac Monitor
+# Mac Monitor 🖥️📱
 
-<div align="center">
+一个用于监控局域网 Mac 电脑运行状态的 iPhone Dashboard 应用系统。
 
-📱 一个用于监控局域网 Mac 电脑运行状态的 iPhone Dashboard 应用
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Platform](https://img.shields.io/badge/platform-iOS%2016%2B%20%7C%20macOS%2013%2B-lightgrey.svg)
 
-[特性](#特性) • [快速开始](#快速开始) • [架构](#架构) • [文档](#文档)
+## 项目简介
 
-</div>
+Mac Monitor 是一个完整的系统监控解决方案，包含：
+- **iPhone Dashboard App** - 横屏全屏监控仪表盘
+- **Mac Agent** - 轻量级系统监控服务（Swift & Python 双实现）
 
----
+通过 Bonjour/mDNS 自动发现局域网内的 Mac 设备，实时显示系统资源使用情况。
 
-## ✨ 特性
+## 功能特性
 
-- 🖥️ **实时监控** - CPU、内存、磁盘、网络流量实时显示
-- 📊 **横屏仪表盘** - 专为横屏设计的大屏监控界面
-- 🔍 **自动发现** - 通过 Bonjour 自动发现局域网内的 Mac 设备
-- 🔔 **智能告警** - 可配置的资源阈值告警
-- 📱 **保持常亮** - 监控时屏幕保持常亮
-- 🌙 **深色模式** - 完整支持深色/浅色模式
-- 🔐 **局域网安全** - 仅限局域网访问，无需外网
+### 📱 iPhone Dashboard
+- ✅ 横屏单页面设计，适合放置在桌面常亮显示
+- ✅ 6 个核心监控卡片（CPU、内存、磁盘、网络、温度、进程）
+- ✅ 自动设备发现（Bonjour）
+- ✅ 设备快速切换
+- ✅ 告警系统（CPU/内存超阈值）
+- ✅ 实时自动刷新（5秒间隔）
+- ✅ 支持 Dark Mode
 
-## 🏗️ 项目结构
+### 🖥️ Mac Agent
+- ✅ REST API 服务
+- ✅ 系统资源监控（CPU、内存、磁盘、网络）
+- ✅ Bonjour 服务自动发布
+- ✅ 跨平台（提供 Swift 和 Python 两种实现）
+- ✅ 轻量级，低资源占用
+
+## 项目结构
 
 ```
 mac-monitor/
 ├── iOS/              # iPhone Dashboard 应用
-│   └── MacMonitor/   # SwiftUI iOS App
-├── agent/            # Mac 监控代理
-│   ├── swift-agent/  # Swift 版本（推荐）
-│   └── python-agent/ # Python 版本（备选）
-└── docs/             # 项目文档
+│   └── MacMonitor/   # SwiftUI 项目
+├── agent/            # Mac 监控 Agent
+│   ├── swift-agent/  # Swift 实现（推荐）
+│   └── python-agent/ # Python 实现
+└── docs/             # 文档
 ```
 
-## 🚀 快速开始
+## 快速开始
 
-### iOS App
+### 1. 启动 Mac Agent
 
-#### 环境要求
-- Xcode 15.0+
-- iOS 16.0+
-- Swift 5.9+
+#### 方式 A: Python 版本（推荐快速测试）
 
-#### 运行步骤
 ```bash
-cd iOS/MacMonitor
-open MacMonitor.xcodeproj
-# 在 Xcode 中选择目标设备并运行
+cd agent/python-agent
+pip install -r requirements.txt
+python3 main.py
 ```
 
-### Mac Agent
-
-#### Swift 版本（推荐）
+#### 方式 B: Swift 版本
 
 ```bash
 cd agent/swift-agent
 swift build
-swift run MacMonitorAgent
+swift run
 ```
 
-#### Python 版本
+Agent 启动后会自动在局域网广播服务。
 
-```bash
-cd agent/python-agent
-pip3 install -r requirements.txt
-python3 main.py
+### 2. 运行 iOS App
+
+1. 使用 Xcode 打开 `iOS/MacMonitor/MacMonitor.xcodeproj`
+2. 选择目标设备（iPhone 或模拟器）
+3. 点击运行（⌘R）
+
+**注意**: 需要授予本地网络访问权限才能发现设备。
+
+## 系统架构
+
+```
+┌─────────────────┐         ┌──────────────────┐         ┌─────────────────┐
+│                 │         │                  │         │                 │
+│  iPhone App     │◄───────►│  Mac Agent       │◄───────►│  Mac System     │
+│  (Dashboard)    │   WiFi  │  (监控服务)       │         │  (被监控电脑)    │
+│                 │         │                  │         │                 │
+└─────────────────┘         └──────────────────┘         └─────────────────┘
+     Bonjour 发现              HTTP REST API               系统调用
+     实时监控数据                JSON 数据传输
 ```
 
-## 📱 界面预览
+## 技术栈
 
-### 横屏监控仪表盘
-- 2x3 网格布局展示 6 个核心指标
-- 实时图表动画
-- 一键切换设备
-
-### 设备发现
-- 自动扫描局域网内的 Mac
-- 显示设备状态和基本信息
-- 支持手动添加设备
-
-### 告警中心
-- 按严重程度分类显示
-- 实时推送通知
-- 可配置告警阈值
-
-## 🛠️ 技术栈
-
-### iOS
-- **框架**: SwiftUI, Combine
-- **网络**: URLSession, Network.framework
-- **服务发现**: Bonjour/mDNS
-- **架构**: MVVM
+### iPhone App
+- SwiftUI & Combine
+- Network Framework (Bonjour)
+- MVVM 架构
+- iOS 16.0+
 
 ### Mac Agent
-- **Swift**: Hummingbird (HTTP Server)
-- **Python**: FastAPI + uvicorn
-- **监控**: psutil, IOKit
-- **服务发布**: Bonjour/Zeroconf
+**Swift 版本:**
+- Hummingbird Web Framework
+- Foundation & IOKit
+- macOS 13.0+
 
-## 📖 文档
+**Python 版本:**
+- FastAPI
+- psutil
+- zeroconf
+- Python 3.9+
 
-- [架构设计](docs/ARCHITECTURE.md)
-- [API 文档](docs/API.md)
-- [开发指南](docs/DEVELOPMENT.md)
+## API 文档
 
-## 🗺️ 开发路线图
+### 端点
 
-### Phase 1: MVP ✅
-- [x] iOS 基础 UI 框架
-- [x] Mac Agent HTTP 服务
+- `GET /api/status` - 获取系统实时状态
+- `GET /api/info` - 获取系统基本信息
+- `GET /health` - 健康检查
+
+### 示例响应
+
+```json
+{
+  "timestamp": "2026-02-06T12:00:00Z",
+  "cpu": {
+    "usage": 0.45,
+    "coreCount": 8,
+    "frequency": 3.2
+  },
+  "memory": {
+    "total": 17179869184,
+    "used": 8589934592,
+    "free": 8589934592,
+    "pressure": 0.51
+  },
+  "disk": {
+    "total": 500000000000,
+    "used": 450000000000,
+    "free": 50000000000
+  },
+  "network": {
+    "bytesIn": 12500000,
+    "bytesOut": 2300000
+  },
+  "uptime": 259200,
+  "processCount": 245,
+  "threadCount": 1432
+}
+```
+
+## 开发路线图
+
+### Phase 1: MVP ✅ (当前)
+- [x] 基础 UI 框架
+- [x] Python Agent 实现
 - [x] Bonjour 设备发现
-- [x] 基础监控功能
+- [x] 核心监控功能
 
-### Phase 2: 核心功能 🚧
-- [ ] 完整的 6 个监控卡片
-- [ ] 设备切换功能
-- [ ] 告警系统
-- [ ] 屏幕常亮
-
-### Phase 3: 增强功能 📋
+### Phase 2: 完善功能 🚧
+- [ ] Swift Agent 完整实现
 - [ ] 历史数据图表
-- [ ] 本地推送通知
-- [ ] 设置页面
-- [ ] 错误处理优化
+- [ ] 进程列表查看
+- [ ] 本地通知推送
 
-### Phase 4: 高级功能 💡
+### Phase 3: 高级功能 📋
 - [ ] WebSocket 实时推送
-- [ ] 进程管理
-- [ ] Widget 支持
 - [ ] 多设备对比视图
+- [ ] Widget 支持
+- [ ] 远程控制功能
 
-## 🤝 贡献
+## 截图
 
-欢迎提交 Issue 和 Pull Request！
+（占位 - 待添加实际截图）
 
-## 📄 License
+## 贡献指南
 
-MIT License - 查看 [LICENSE](LICENSE) 文件了解详情
+欢迎贡献代码！请参考以下步骤：
 
-## 👨‍💻 作者
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+## 许可证
+
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
+
+## 作者
 
 [@charsunny](https://github.com/charsunny)
 
+## 致谢
+
+- [Hummingbird](https://github.com/hummingbird-project/hummingbird) - Swift Web 框架
+- [FastAPI](https://fastapi.tiangolo.com/) - Python Web 框架
+- [psutil](https://github.com/giampaolo/psutil) - 系统监控库
+
 ---
 
-<div align="center">
-Made with ❤️ for Mac users
-</div>
+⭐️ 如果觉得有用，请给个 Star！
