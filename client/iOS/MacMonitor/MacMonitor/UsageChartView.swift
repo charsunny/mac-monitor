@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import DGCharts
 
 struct UsageChartView: View {
     let data: [Double]

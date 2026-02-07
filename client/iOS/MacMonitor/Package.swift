@@ -12,14 +12,11 @@ let package = Package(
             targets: ["MacMonitor"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/danielgindi/Charts.git", from: "5.0.0")
     ],
     targets: [
         .target(
             name: "MacMonitor",
-            dependencies: [
-                .product(name: "DGCharts", package: "Charts")
-            ],
+            dependencies: [],
             path: "MacMonitor"),
         .testTarget(
             name: "MacMonitorTests",
