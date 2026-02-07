@@ -85,18 +85,14 @@ struct DashboardGridView: View {
     @State private var currentPage = 0
     
     var body: some View {
-        let cards = getAllCards()
         let cardsPerPage = 6  // 2×3 in landscape, 3×2 in portrait (both = 6 cards)
-        let pageCount = (cards.count + cardsPerPage - 1) / cardsPerPage
+        let totalCards = 6  // Total number of cards
+        let pageCount = (totalCards + cardsPerPage - 1) / cardsPerPage
         
         VStack(spacing: 0) {
             // Main content area - fills remaining space
             TabView(selection: $currentPage) {
                 ForEach(0..<pageCount, id: \.self) { pageIndex in
-                    let startIndex = pageIndex * cardsPerPage
-                    let endIndex = min(startIndex + cardsPerPage, cards.count)
-                    let pageCards = Array(cards[startIndex..<endIndex])
-                    
                     if isLandscape {
                         // Landscape: 2 rows × 3 columns
                         LazyVGrid(columns: [
@@ -104,9 +100,7 @@ struct DashboardGridView: View {
                             GridItem(.flexible(), spacing: 12),
                             GridItem(.flexible(), spacing: 12)
                         ], spacing: 12) {
-                            ForEach(0..<pageCards.count, id: \.self) { index in
-                                pageCards[index]
-                            }
+                            dashboardCards
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
@@ -116,29 +110,26 @@ struct DashboardGridView: View {
                             GridItem(.flexible(), spacing: 12),
                             GridItem(.flexible(), spacing: 12)
                         ], spacing: 12) {
-                            ForEach(0..<pageCards.count, id: \.self) { index in
-                                pageCards[index]
-                            }
+                            dashboardCards
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                     }
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: .always))
+            .tabViewStyle(.page(indexDisplayMode: .automatic))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
         }
     }
     
-    private func getAllCards() -> [AnyView] {
-        return [
-            AnyView(CPUCardView()),
-            AnyView(MemoryCardView()),
-            AnyView(DiskCardView()),
-            AnyView(NetworkCardView()),
-            AnyView(TemperatureCardView()),
-            AnyView(ProcessCardView())
-        ]
+    @ViewBuilder
+    private var dashboardCards: some View {
+        CPUCardView()
+        MemoryCardView()
+        DiskCardView()
+        NetworkCardView()
+        TemperatureCardView()
+        ProcessCardView()
     }
 }
 
