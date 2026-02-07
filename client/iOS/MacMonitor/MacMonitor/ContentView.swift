@@ -78,6 +78,14 @@ struct ContentView: View {
 }
 
 // MARK: - Dashboard Grid View with Pagination
+/// A view that displays monitoring cards in a grid layout with pagination support.
+/// 
+/// Grid layouts:
+/// - Landscape: 2 rows × 3 columns (6 cards per page)
+/// - Portrait: 3 rows × 2 columns (6 cards per page)
+///
+/// Currently shows all 6 cards on a single page. If more cards are added in the future,
+/// the pagination logic will automatically split them across multiple pages with horizontal scrolling.
 struct DashboardGridView: View {
     let isLandscape: Bool
     let geometry: GeometryProxy
@@ -86,11 +94,13 @@ struct DashboardGridView: View {
     
     var body: some View {
         let cardsPerPage = 6  // 2×3 in landscape, 3×2 in portrait (both = 6 cards)
-        let totalCards = 6  // Total number of cards
-        let pageCount = (totalCards + cardsPerPage - 1) / cardsPerPage
+        let totalCards = 6  // Total number of cards (currently CPU, Memory, Disk, Network, Temperature, Process)
+        let pageCount = (totalCards + cardsPerPage - 1) / cardsPerPage  // Currently 1 page
         
         VStack(spacing: 0) {
             // Main content area - fills remaining space
+            // Note: Currently pageCount = 1 since we have 6 cards and show 6 per page
+            // If more cards are added in the future, they will automatically paginate
             TabView(selection: $currentPage) {
                 ForEach(0..<pageCount, id: \.self) { pageIndex in
                     if isLandscape {
