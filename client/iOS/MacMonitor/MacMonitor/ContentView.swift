@@ -31,19 +31,20 @@ struct ContentView: View {
                 }
                 
                 // Dashboard Grid
-                ScrollView {
-                    if isLandscape {
-                        // Landscape: 3x2 grid
-                        LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: 16),
-                            GridItem(.flexible(), spacing: 16),
-                            GridItem(.flexible(), spacing: 16)
-                        ], spacing: 16) {
-                            dashboardCards
-                        }
-                        .padding()
-                    } else {
-                        // Portrait: 2x3 grid
+                if isLandscape {
+                    // Landscape: 3x2 grid - no scrolling needed
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 12),
+                        GridItem(.flexible(), spacing: 12),
+                        GridItem(.flexible(), spacing: 12)
+                    ], spacing: 12) {
+                        dashboardCards
+                    }
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
+                } else {
+                    // Portrait: 2x3 grid with scroll
+                    ScrollView {
                         LazyVGrid(columns: [
                             GridItem(.flexible(), spacing: 16),
                             GridItem(.flexible(), spacing: 16)

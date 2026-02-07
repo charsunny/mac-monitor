@@ -17,6 +17,15 @@ class MonitorViewModel: ObservableObject {
     @Published var lastUpdateTime = "--"
     @Published var currentAlert: String?
     
+    // Historical data for charts (keep last 30 data points)
+    @Published var cpuHistory: [Double] = []
+    @Published var memoryHistory: [Double] = []
+    @Published var diskHistory: [Double] = []
+    @Published var networkInHistory: [Double] = []
+    @Published var networkOutHistory: [Double] = []
+    @Published var temperatureHistory: [Double] = []
+    private let maxHistoryCount = 30
+    
     private var cancellables = Set<AnyCancellable>()
     private var refreshTimer: Timer?
     private let apiClient = APIClient()
@@ -68,6 +77,7 @@ class MonitorViewModel: ObservableObject {
                 self?.status = status
                 self?.isConnected = true
                 self?.updateLastUpdateTime()
+                self?.updateHistoricalData(status: status)
                 self?.checkAlerts()
             }
             .store(in: &cancellables)
@@ -96,6 +106,46 @@ class MonitorViewModel: ObservableObject {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss"
         lastUpdateTime = formatter.string(from: Date())
+    }
+    
+    private func updateHistoricalData(status: SystemStatus) {
+        // Update CPU history
+        cpuHistory.append(status.cpu.usage)
+        if cpuHistory.count > maxHistoryCount {
+            cpuHistory.removeFirst()
+        }
+        
+        // Update Memory history
+        memoryHistory.append(status.memory.pressure)
+        if memoryHistory.count > maxHistoryCount {
+            memoryHistory.removeFirst()
+        }
+        
+        // Update Disk history
+        let diskUsage = status.disk.total > 0 ? Double(status.disk.used) / Double(status.disk.total) : 0
+        diskHistory.append(diskUsage)
+        if diskHistory.count > maxHistoryCount {
+            diskHistory.removeFirst()
+        }
+        
+        // Update Network history
+        networkInHistory.append(Double(status.network.bytesIn))
+        if networkInHistory.count > maxHistoryCount {
+            networkInHistory.removeFirst()
+        }
+        
+        networkOutHistory.append(Double(status.network.bytesOut))
+        if networkOutHistory.count > maxHistoryCount {
+            networkOutHistory.removeFirst()
+        }
+        
+        // Update Temperature history (if available)
+        if let temp = status.temperature {
+            temperatureHistory.append(temp)
+            if temperatureHistory.count > maxHistoryCount {
+                temperatureHistory.removeFirst()
+            }
+        }
     }
     
     private func checkAlerts() {

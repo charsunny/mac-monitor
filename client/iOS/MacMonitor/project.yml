@@ -38,9 +38,10 @@ targets:
         CFBundleVersion: "1"
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
-          - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+          - UIInterfaceOrientationPortrait
+        UIInterfaceOrientation: UIInterfaceOrientationLandscapeLeft
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationPortraitUpsideDown

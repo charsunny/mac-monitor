@@ -14,12 +14,20 @@ struct CPUCardView: View {
     var body: some View {
         MonitorCardView(
             title: "💻 CPU",
-            value: String(format: "%.1f%%", monitorViewModel.status?.cpu.usage ?? 0),
+            value: String(format: "%.1f%%", (monitorViewModel.status?.cpu.usage ?? 0) * 100),
             details: [
                 ("核心数", "\(monitorViewModel.status?.cpu.coreCount ?? 0)"),
                 ("频率", String(format: "%.1f GHz", monitorViewModel.status?.cpu.frequency ?? 0))
             ],
-            progress: (monitorViewModel.status?.cpu.usage ?? 0) / 100.0,
+            progress: monitorViewModel.status?.cpu.usage ?? 0,
+            chart: AnyView(
+                UsageChartView(
+                    data: monitorViewModel.cpuHistory,
+                    maxValue: 1.0,
+                    color: monitorViewModel.cpuHistory.last ?? 0 >= 0.9 ? .red :
+                           monitorViewModel.cpuHistory.last ?? 0 >= 0.7 ? .orange : .blue
+                )
+            ),
             lastUpdate: monitorViewModel.lastUpdateTime
         )
     }
@@ -42,6 +50,14 @@ struct MemoryCardView: View {
                 ("总容量", formatBytes(total))
             ],
             progress: pressure,
+            chart: AnyView(
+                UsageChartView(
+                    data: monitorViewModel.memoryHistory,
+                    maxValue: 1.0,
+                    color: monitorViewModel.memoryHistory.last ?? 0 >= 0.9 ? .red :
+                           monitorViewModel.memoryHistory.last ?? 0 >= 0.7 ? .orange : .purple
+                )
+            ),
             lastUpdate: monitorViewModel.lastUpdateTime
         )
     }
@@ -65,6 +81,14 @@ struct DiskCardView: View {
                 ("可用", formatBytes(free))
             ],
             progress: usage,
+            chart: AnyView(
+                UsageChartView(
+                    data: monitorViewModel.diskHistory,
+                    maxValue: 1.0,
+                    color: monitorViewModel.diskHistory.last ?? 0 >= 0.9 ? .red :
+                           monitorViewModel.diskHistory.last ?? 0 >= 0.7 ? .orange : .green
+                )
+            ),
             lastUpdate: monitorViewModel.lastUpdateTime
         )
     }
@@ -80,76 +104,52 @@ struct NetworkCardView: View {
         let packetsIn = monitorViewModel.status?.network.packetsIn ?? 0
         let packetsOut = monitorViewModel.status?.network.packetsOut ?? 0
         
+        // Calculate max value for chart scaling
+        let maxBytesIn = monitorViewModel.networkInHistory.max() ?? 1.0
+        let maxBytesOut = monitorViewModel.networkOutHistory.max() ?? 1.0
+        let maxValue = max(maxBytesIn, maxBytesOut, 1.0)
+        
         return MonitorCardView(
             title: "🌐 网络",
             value: "",
             customContent: AnyView(
-                VStack(spacing: 12) {
-                    HStack(spacing: 20) {
+                VStack(spacing: 8) {
+                    HStack(spacing: 16) {
                         VStack {
                             Text(formatBytesPerSecond(bytesIn))
-                                .font(.title2)
+                                .font(.title3)
                                 .fontWeight(.bold)
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [.blue, .purple],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
+                                .foregroundColor(.blue)
                             Text("↓ 下载")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
                         
                         VStack {
                             Text(formatBytesPerSecond(bytesOut))
-                                .font(.title2)
+                                .font(.title3)
                                 .fontWeight(.bold)
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [.blue, .purple],
-                                        startPoint: .leading,
-                                        endPoint: .trailing
-                                    )
-                                )
+                                .foregroundColor(.purple)
                             Text("↑ 上传")
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                         }
                     }
                     
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("接收包数")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(formatNumber(packetsIn))
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(8)
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(8)
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("发送包数")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text(formatNumber(packetsOut))
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(8)
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(8)
+                    // Network chart
+                    if monitorViewModel.networkInHistory.count > 1 {
+                        NetworkChartView(
+                            dataIn: monitorViewModel.networkInHistory,
+                            dataOut: monitorViewModel.networkOutHistory,
+                            maxValue: maxValue
+                        )
+                        .padding(.vertical, 4)
                     }
                 }
             ),
             details: [],
             progress: nil,
+            chart: nil,
             lastUpdate: monitorViewModel.lastUpdateTime
         )
     }
@@ -172,6 +172,14 @@ struct TemperatureCardView: View {
                 ("充电状态", isCharging != nil ? (isCharging! ? "充电中" : "未充电") : "N/A")
             ],
             progress: nil,
+            chart: monitorViewModel.temperatureHistory.count > 1 ? AnyView(
+                UsageChartView(
+                    data: monitorViewModel.temperatureHistory,
+                    maxValue: 100.0,
+                    color: monitorViewModel.temperatureHistory.last ?? 0 >= 80 ? .red :
+                           monitorViewModel.temperatureHistory.last ?? 0 >= 60 ? .orange : .cyan
+                )
+            ) : nil,
             lastUpdate: monitorViewModel.lastUpdateTime
         )
     }
@@ -194,6 +202,7 @@ struct ProcessCardView: View {
                 ("运行时间", formatUptime(uptime))
             ],
             progress: nil,
+            chart: nil,
             lastUpdate: monitorViewModel.lastUpdateTime
         )
     }
@@ -206,10 +215,11 @@ struct MonitorCardView: View {
     var customContent: AnyView?
     let details: [(String, String)]
     let progress: Double?
+    var chart: AnyView?
     let lastUpdate: String
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
             // Header
             HStack {
                 Text(title)
@@ -226,9 +236,9 @@ struct MonitorCardView: View {
             if let customContent = customContent {
                 customContent
             } else {
-                VStack(spacing: 8) {
+                VStack(spacing: 6) {
                     Text(value)
-                        .font(.system(size: 42, weight: .bold, design: .rounded))
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: progressColor(progress ?? 0),
@@ -241,29 +251,35 @@ struct MonitorCardView: View {
                          title.contains("内存") ? "使用率" :
                          title.contains("磁盘") ? "使用率" :
                          title.contains("进程") ? "进程数" : "")
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundColor(.secondary)
                         .textCase(.uppercase)
                 }
                 .frame(maxWidth: .infinity)
             }
             
+            // Chart (if provided)
+            if let chart = chart {
+                chart
+                    .padding(.vertical, 2)
+            }
+            
             // Details
             if !details.isEmpty {
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     ForEach(details.indices, id: \.self) { index in
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text(details[index].0)
-                                .font(.caption)
+                                .font(.caption2)
                                 .foregroundColor(.secondary)
                             Text(details[index].1)
-                                .font(.subheadline)
+                                .font(.caption)
                                 .fontWeight(.semibold)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(8)
+                        .padding(6)
                         .background(Color(.secondarySystemBackground))
-                        .cornerRadius(8)
+                        .cornerRadius(6)
                     }
                 }
             }
@@ -272,10 +288,10 @@ struct MonitorCardView: View {
             if let progress = progress {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 4)
+                        RoundedRectangle(cornerRadius: 3)
                             .fill(Color(.systemGray5))
                         
-                        RoundedRectangle(cornerRadius: 4)
+                        RoundedRectangle(cornerRadius: 3)
                             .fill(
                                 LinearGradient(
                                     colors: progressColor(progress),
@@ -286,13 +302,13 @@ struct MonitorCardView: View {
                             .frame(width: geometry.size.width * min(progress, 1.0))
                     }
                 }
-                .frame(height: 8)
+                .frame(height: 6)
             }
         }
-        .padding()
+        .padding(12)
         .background(Color(.systemBackground))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 2)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
     }
     
     private func progressColor(_ value: Double) -> [Color] {
