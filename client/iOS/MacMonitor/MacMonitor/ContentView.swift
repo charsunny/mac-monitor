@@ -30,29 +30,19 @@ struct ContentView: View {
                         .transition(.move(edge: .top))
                 }
                 
-                // Dashboard Grid
+                // Dashboard Grid - Fill remaining space
                 if isLandscape {
-                    // Landscape: 3x2 grid - no scrolling needed
-                    LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 12),
-                        GridItem(.flexible(), spacing: 12),
-                        GridItem(.flexible(), spacing: 12)
-                    ], spacing: 12) {
-                        dashboardCards
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
+                    // Landscape: 2 rows × 3 columns with horizontal paging
+                    DashboardGridView(
+                        isLandscape: true,
+                        geometry: geometry
+                    )
                 } else {
-                    // Portrait: 2x3 grid with scroll
-                    ScrollView {
-                        LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: 16),
-                            GridItem(.flexible(), spacing: 16)
-                        ], spacing: 16) {
-                            dashboardCards
-                        }
-                        .padding()
-                    }
+                    // Portrait: 3 rows × 2 columns with horizontal paging
+                    DashboardGridView(
+                        isLandscape: false,
+                        geometry: geometry
+                    )
                 }
                 
                 // Footer
@@ -84,6 +74,83 @@ struct ContentView: View {
         NetworkCardView()
         TemperatureCardView()
         ProcessCardView()
+    }
+}
+
+// MARK: - Dashboard Grid View with Pagination
+struct DashboardGridView: View {
+    let isLandscape: Bool
+    let geometry: GeometryProxy
+    @EnvironmentObject var monitorViewModel: MonitorViewModel
+    @State private var currentPage = 0
+    
+    var body: some View {
+        let cards = getAllCards()
+        let cardsPerPage = isLandscape ? 6 : 6  // 2×3 in landscape, 3×2 in portrait
+        let pageCount = (cards.count + cardsPerPage - 1) / cardsPerPage
+        
+        VStack(spacing: 0) {
+            // Main content area - fills remaining space
+            TabView(selection: $currentPage) {
+                ForEach(0..<pageCount, id: \.self) { pageIndex in
+                    let startIndex = pageIndex * cardsPerPage
+                    let endIndex = min(startIndex + cardsPerPage, cards.count)
+                    let pageCards = Array(cards[startIndex..<endIndex])
+                    
+                    if isLandscape {
+                        // Landscape: 2 rows × 3 columns
+                        LazyVGrid(columns: [
+                            GridItem(.flexible(), spacing: 12),
+                            GridItem(.flexible(), spacing: 12),
+                            GridItem(.flexible(), spacing: 12)
+                        ], spacing: 12) {
+                            ForEach(0..<pageCards.count, id: \.self) { index in
+                                pageCards[index]
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                    } else {
+                        // Portrait: 3 rows × 2 columns
+                        LazyVGrid(columns: [
+                            GridItem(.flexible(), spacing: 12),
+                            GridItem(.flexible(), spacing: 12)
+                        ], spacing: 12) {
+                            ForEach(0..<pageCards.count, id: \.self) { index in
+                                pageCards[index]
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                    }
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: pageCount > 1 ? .always : .never))
+            .indexViewStyle(.page(backgroundDisplayMode: .always))
+            
+            // Page indicator (if more than one page)
+            if pageCount > 1 {
+                HStack(spacing: 8) {
+                    ForEach(0..<pageCount, id: \.self) { index in
+                        Circle()
+                            .fill(currentPage == index ? Color.accentColor : Color.secondary.opacity(0.3))
+                            .frame(width: 8, height: 8)
+                    }
+                }
+                .padding(.vertical, 8)
+            }
+        }
+    }
+    
+    private func getAllCards() -> [AnyView] {
+        return [
+            AnyView(CPUCardView()),
+            AnyView(MemoryCardView()),
+            AnyView(DiskCardView()),
+            AnyView(NetworkCardView()),
+            AnyView(TemperatureCardView()),
+            AnyView(ProcessCardView())
+        ]
     }
 }
 
