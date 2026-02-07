@@ -86,7 +86,7 @@ struct DashboardGridView: View {
     
     var body: some View {
         let cards = getAllCards()
-        let cardsPerPage = isLandscape ? 6 : 6  // 2×3 in landscape, 3×2 in portrait
+        let cardsPerPage = 6  // 2×3 in landscape, 3×2 in portrait (both = 6 cards)
         let pageCount = (cards.count + cardsPerPage - 1) / cardsPerPage
         
         VStack(spacing: 0) {
@@ -125,20 +125,8 @@ struct DashboardGridView: View {
                     }
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: pageCount > 1 ? .always : .never))
+            .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
-            
-            // Page indicator (if more than one page)
-            if pageCount > 1 {
-                HStack(spacing: 8) {
-                    ForEach(0..<pageCount, id: \.self) { index in
-                        Circle()
-                            .fill(currentPage == index ? Color.accentColor : Color.secondary.opacity(0.3))
-                            .frame(width: 8, height: 8)
-                    }
-                }
-                .padding(.vertical, 8)
-            }
         }
     }
     
