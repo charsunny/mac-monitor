@@ -30,29 +30,19 @@ struct ContentView: View {
                         .transition(.move(edge: .top))
                 }
                 
-                // Dashboard Grid
+                // Dashboard Grid - Fill remaining space
                 if isLandscape {
-                    // Landscape: 3x2 grid - no scrolling needed
-                    LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 12),
-                        GridItem(.flexible(), spacing: 12),
-                        GridItem(.flexible(), spacing: 12)
-                    ], spacing: 12) {
-                        dashboardCards
-                    }
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
+                    // Landscape: 2 rows × 3 columns with horizontal paging
+                    DashboardGridView(
+                        isLandscape: true,
+                        geometry: geometry
+                    )
                 } else {
-                    // Portrait: 2x3 grid with scroll
-                    ScrollView {
-                        LazyVGrid(columns: [
-                            GridItem(.flexible(), spacing: 16),
-                            GridItem(.flexible(), spacing: 16)
-                        ], spacing: 16) {
-                            dashboardCards
-                        }
-                        .padding()
-                    }
+                    // Portrait: 3 rows × 2 columns with horizontal paging
+                    DashboardGridView(
+                        isLandscape: false,
+                        geometry: geometry
+                    )
                 }
                 
                 // Footer
@@ -73,6 +63,72 @@ struct ContentView: View {
         .onDisappear {
             deviceDiscovery.stopDiscovery()
             monitorViewModel.stopAutoRefresh()
+        }
+    }
+    
+    @ViewBuilder
+    private var dashboardCards: some View {
+        CPUCardView()
+        MemoryCardView()
+        DiskCardView()
+        NetworkCardView()
+        TemperatureCardView()
+        ProcessCardView()
+    }
+}
+
+// MARK: - Dashboard Grid View with Pagination
+/// A view that displays monitoring cards in a grid layout with pagination support.
+/// 
+/// Grid layouts:
+/// - Landscape: 2 rows × 3 columns (6 cards per page)
+/// - Portrait: 3 rows × 2 columns (6 cards per page)
+///
+/// Currently shows all 6 cards on a single page. If more cards are added in the future,
+/// the pagination logic will automatically split them across multiple pages with horizontal scrolling.
+struct DashboardGridView: View {
+    let isLandscape: Bool
+    let geometry: GeometryProxy
+    @EnvironmentObject var monitorViewModel: MonitorViewModel
+    @State private var currentPage = 0
+    
+    var body: some View {
+        let cardsPerPage = 6  // 2×3 in landscape, 3×2 in portrait (both = 6 cards)
+        let totalCards = 6  // Total number of cards (currently CPU, Memory, Disk, Network, Temperature, Process)
+        let pageCount = (totalCards + cardsPerPage - 1) / cardsPerPage  // Currently 1 page
+        
+        VStack(spacing: 0) {
+            // Main content area - fills remaining space
+            // Note: Currently pageCount = 1 since we have 6 cards and show 6 per page
+            // If more cards are added in the future, they will automatically paginate
+            TabView(selection: $currentPage) {
+                ForEach(0..<pageCount, id: \.self) { pageIndex in
+                    if isLandscape {
+                        // Landscape: 2 rows × 3 columns
+                        LazyVGrid(columns: [
+                            GridItem(.flexible(), spacing: 12),
+                            GridItem(.flexible(), spacing: 12),
+                            GridItem(.flexible(), spacing: 12)
+                        ], spacing: 12) {
+                            dashboardCards
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                    } else {
+                        // Portrait: 3 rows × 2 columns
+                        LazyVGrid(columns: [
+                            GridItem(.flexible(), spacing: 12),
+                            GridItem(.flexible(), spacing: 12)
+                        ], spacing: 12) {
+                            dashboardCards
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                    }
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .automatic))
+            .indexViewStyle(.page(backgroundDisplayMode: .always))
         }
     }
     
