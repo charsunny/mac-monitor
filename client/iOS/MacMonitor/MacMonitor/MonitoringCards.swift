@@ -224,88 +224,108 @@ struct MonitorCardView: View {
             HStack {
                 Text(title)
                     .font(.headline)
-                
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+
                 Spacer()
-                
+
                 Text(lastUpdate)
                     .font(.caption2)
                     .foregroundColor(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
-            
-            // Main content
-            if let customContent = customContent {
-                customContent
-            } else {
-                VStack(spacing: 6) {
-                    Text(value)
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: progressColor(progress ?? 0),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                    
-                    Text(title.contains("CPU") ? "使用率" : 
-                         title.contains("内存") ? "使用率" :
-                         title.contains("磁盘") ? "使用率" :
-                         title.contains("进程") ? "进程数" : "")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .textCase(.uppercase)
-                }
-                .frame(maxWidth: .infinity)
-            }
-            
-            // Chart (if provided)
-            if let chart = chart {
-                chart
-                    .padding(.vertical, 2)
-            }
-            
-            // Details
-            if !details.isEmpty {
-                HStack(spacing: 6) {
-                    ForEach(details.indices, id: \.self) { index in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(details[index].0)
+
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 8) {
+                    // Main content
+                    if let customContent = customContent {
+                        customContent
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    } else {
+                        VStack(spacing: 6) {
+                            Text(value)
+                                .font(.system(size: 32, weight: .bold, design: .rounded))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: progressColor(progress ?? 0),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+
+                            Text(title.contains("CPU") ? "使用率" :
+                                 title.contains("内存") ? "使用率" :
+                                 title.contains("磁盘") ? "使用率" :
+                                 title.contains("进程") ? "进程数" : "")
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
-                            Text(details[index].1)
-                                .font(.caption)
-                                .fontWeight(.semibold)
+                                .textCase(.uppercase)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(6)
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(6)
+                        .frame(maxWidth: .infinity)
+                    }
+
+                    // Chart (if provided)
+                    if let chart = chart {
+                        chart
+                            .padding(.vertical, 2)
+                    }
+
+                    // Details
+                    if !details.isEmpty {
+                        HStack(spacing: 6) {
+                            ForEach(details.indices, id: \.self) { index in
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(details[index].0)
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
+                                    Text(details[index].1)
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.7)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(6)
+                                .background(Color(.secondarySystemBackground))
+                                .cornerRadius(6)
+                            }
+                        }
+                    }
+
+                    // Progress bar
+                    if let progress = progress {
+                        GeometryReader { geometry in
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(Color(.systemGray5))
+
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: progressColor(progress),
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .frame(width: geometry.size.width * min(progress, 1.0))
+                            }
+                        }
+                        .frame(height: 6)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            
-            // Progress bar
-            if let progress = progress {
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(Color(.systemGray5))
-                        
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(
-                                LinearGradient(
-                                    colors: progressColor(progress),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(width: geometry.size.width * min(progress, 1.0))
-                    }
-                }
-                .frame(height: 6)
-            }
+            .frame(maxHeight: .infinity)
         }
         .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
